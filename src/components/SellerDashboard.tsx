@@ -16,7 +16,20 @@ import {
   Eye,
   Truck,
   Bell,
-  TrendingUp
+  TrendingUp,
+  X,
+  Upload,
+  ImageIcon,
+  User,
+  ChevronRight,
+  Star,
+  Heart,
+  MousePointerClick,
+  Users,
+  Clock,
+  ExternalLink,
+  Award,
+  ShoppingCart
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -38,7 +51,10 @@ import { Switch } from './ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Label } from './ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { SwapMarketplace } from './SwapMarketplace';
+import { toast } from 'sonner';
 
 export function SellerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -96,6 +112,8 @@ export function SellerDashboard() {
         return <SwapMarketplace />;
       case 'analytics':
         return <AnalyticsView />;
+      case 'mystore':
+        return <StoreView />;
       case 'settings':
         return <SettingsView />;
       case 'support':
@@ -150,6 +168,12 @@ export function SellerDashboard() {
             label="Analytics" 
           />
           <NavButton 
+            active={activeTab === 'mystore'} 
+            onClick={() => setActiveTab('mystore')} 
+            icon={Store} 
+            label="My Store" 
+          />
+          <NavButton 
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
             icon={Settings} 
@@ -182,9 +206,68 @@ export function SellerDashboard() {
             <h1 className="text-2xl font-bold text-gray-800 capitalize">{activeTab}</h1>
             <div className="flex items-center gap-4">
               <NotificationsMenu />
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[#2D5F3F] font-bold">
-                JD
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[#2D5F3F] font-bold hover:bg-gray-200 transition-colors cursor-pointer">
+                    JD
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-0" align="end">
+                  <div className="p-4 border-b border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-[#2D5F3F] flex items-center justify-center text-white font-bold text-lg">
+                        JD
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold truncate">John Doe</p>
+                        <p className="text-xs text-gray-500 truncate">seller@example.com</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="py-2">
+                    <button
+                      onClick={() => setActiveTab('settings')}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <User className="w-4 h-4 text-gray-600" />
+                      <span className="text-sm">View Profile</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('settings')}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <Settings className="w-4 h-4 text-gray-600" />
+                      <span className="text-sm">Account Settings</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('mystore')}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <Store className="w-4 h-4 text-gray-600" />
+                      <span className="text-sm">My Store</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('support')}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <LifeBuoy className="w-4 h-4 text-gray-600" />
+                      <span className="text-sm">Help & Support</span>
+                    </button>
+                  </div>
+                  <div className="border-t border-gray-100 py-2">
+                    <button
+                      onClick={() => {
+                        toast.success('Signed out successfully');
+                        window.location.hash = '#/home';
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors text-left text-red-600"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="text-sm font-medium">Sign Out</span>
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </header>
         )}
@@ -197,14 +280,7 @@ export function SellerDashboard() {
   );
 }
 
-interface NavButtonProps {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-}
-
-function NavButton({ active, onClick, icon: Icon, label }: NavButtonProps) {
+function NavButton({ active, onClick, icon: Icon, label }: any) {
   return (
     <button
       onClick={onClick}
@@ -456,6 +532,55 @@ function DashboardOverview() {
 }
 
 function ProductsView() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [products, setProducts] = useState([
+    { name: 'Organic Cotton T-Shirt', status: 'Active', price: '$29.00', stock: 124 },
+    { name: 'Bamboo Toothbrush Set', status: 'Active', price: '$12.50', stock: 45 },
+    { name: 'Recycled Denim Jeans', status: 'Draft', price: '$89.00', stock: 0 },
+  ]);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    stock: '',
+    status: 'Active',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!formData.name || !formData.price || !formData.stock) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Add new product
+    const newProduct = {
+      name: formData.name,
+      status: formData.status,
+      price: `$${parseFloat(formData.price).toFixed(2)}`,
+      stock: parseInt(formData.stock),
+    };
+
+    setProducts([newProduct, ...products]);
+    
+    // Reset form and close dialog
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      category: '',
+      stock: '',
+      status: 'Active',
+    });
+    setIsDialogOpen(false);
+    
+    toast.success('Product added successfully!');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -463,7 +588,10 @@ function ProductsView() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input placeholder="Search products..." className="pl-10" />
         </div>
-        <Button className="bg-[#2D5F3F] text-white">
+        <Button 
+          className="bg-[#2D5F3F] text-white"
+          onClick={() => setIsDialogOpen(true)}
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Product
         </Button>
@@ -482,11 +610,7 @@ function ProductsView() {
               </tr>
             </thead>
             <tbody>
-              {[
-                { name: 'Organic Cotton T-Shirt', status: 'Active', price: '$29.00', stock: 124 },
-                { name: 'Bamboo Toothbrush Set', status: 'Active', price: '$12.50', stock: 45 },
-                { name: 'Recycled Denim Jeans', status: 'Draft', price: '$89.00', stock: 0 },
-              ].map((product, i) => (
+              {products.map((product, i) => (
                 <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
                   <td className="p-4 font-medium">{product.name}</td>
                   <td className="p-4">
@@ -509,12 +633,157 @@ function ProductsView() {
           </table>
         </CardContent>
       </Card>
+
+      {/* Add Product Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Product</DialogTitle>
+            <DialogDescription>
+              Create a new eco-friendly product listing for your store.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Product Name */}
+            <div className="space-y-2">
+              <Label htmlFor="product-name">
+                Product Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="product-name"
+                placeholder="e.g., Organic Cotton T-Shirt"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Describe your product, its sustainability features, materials, etc."
+                className="min-h-[100px]"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+
+            {/* Price and Stock */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="price">
+                  Price <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="pl-7"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="stock">
+                  Stock Quantity <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="stock"
+                  type="number"
+                  placeholder="0"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Category and Status */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="clothing">Clothing</SelectItem>
+                    <SelectItem value="home">Home & Living</SelectItem>
+                    <SelectItem value="personal-care">Personal Care</SelectItem>
+                    <SelectItem value="accessories">Accessories</SelectItem>
+                    <SelectItem value="food">Food & Beverage</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value })}
+                >
+                  <SelectTrigger id="status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Draft">Draft</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Product Image Upload */}
+            <div className="space-y-2">
+              <Label>Product Image</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#2D5F3F] transition-colors cursor-pointer">
+                <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
+                <p className="text-xs text-gray-400">PNG, JPG up to 5MB</p>
+              </div>
+            </div>
+
+            {/* Dialog Footer */}
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-[#2D5F3F] text-white">
+                Create Product
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
 function OrdersView() {
   const [filter, setFilter] = useState('All');
+  const [advancedFilters, setAdvancedFilters] = useState({
+    dateRange: '',
+    priceRange: '',
+    itemCount: '',
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const orders = [
     { id: '#2024', customer: 'Alice Johnson', date: '2023-10-24', total: '$145.00', status: 'Pending', items: 2 },
@@ -524,7 +793,41 @@ function OrdersView() {
     { id: '#2020', customer: 'Evan Wright', date: '2023-10-20', total: '$120.00', status: 'Processing', items: 2 },
   ];
 
-  const filteredOrders = filter === 'All' ? orders : orders.filter(order => order.status === filter);
+  const applyAdvancedFilters = (ordersList: typeof orders) => {
+    return ordersList.filter(order => {
+      // Price filter
+      if (advancedFilters.priceRange) {
+        const price = parseFloat(order.total.replace('$', ''));
+        if (advancedFilters.priceRange === 'under50' && price >= 50) return false;
+        if (advancedFilters.priceRange === '50-100' && (price < 50 || price > 100)) return false;
+        if (advancedFilters.priceRange === '100-200' && (price < 100 || price > 200)) return false;
+        if (advancedFilters.priceRange === 'over200' && price <= 200) return false;
+      }
+
+      // Item count filter
+      if (advancedFilters.itemCount) {
+        if (advancedFilters.itemCount === '1' && order.items !== 1) return false;
+        if (advancedFilters.itemCount === '2' && order.items !== 2) return false;
+        if (advancedFilters.itemCount === '3+' && order.items < 3) return false;
+      }
+
+      return true;
+    });
+  };
+
+  const statusFilteredOrders = filter === 'All' ? orders : orders.filter(order => order.status === filter);
+  const filteredOrders = applyAdvancedFilters(statusFilteredOrders);
+
+  const activeFilterCount = Object.values(advancedFilters).filter(v => v !== '').length;
+
+  const clearFilters = () => {
+    setAdvancedFilters({
+      dateRange: '',
+      priceRange: '',
+      itemCount: '',
+    });
+    toast.success('Filters cleared');
+  };
 
   return (
     <div className="space-y-6">
@@ -549,10 +852,104 @@ function OrdersView() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input placeholder="Search orders..." className="pl-10" />
           </div>
-          <Button variant="outline" className="gap-2">
-            <Filter className="w-4 h-4" />
-            Filter
-          </Button>
+          <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2 relative">
+                <Filter className="w-4 h-4" />
+                Filter
+                {activeFilterCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#2D5F3F] text-white rounded-full text-xs flex items-center justify-center">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="end">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="font-semibold">Advanced Filters</h4>
+                  <p className="text-xs text-gray-500">Narrow down your order results</p>
+                </div>
+
+                {/* Date Range Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Date Range</Label>
+                  <Select
+                    value={advancedFilters.dateRange}
+                    onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, dateRange: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select date range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="today">Today</SelectItem>
+                      <SelectItem value="week">This Week</SelectItem>
+                      <SelectItem value="month">This Month</SelectItem>
+                      <SelectItem value="custom">Custom Range</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Price Range Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Price Range</Label>
+                  <Select
+                    value={advancedFilters.priceRange}
+                    onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, priceRange: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select price range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="under50">Under $50</SelectItem>
+                      <SelectItem value="50-100">$50 - $100</SelectItem>
+                      <SelectItem value="100-200">$100 - $200</SelectItem>
+                      <SelectItem value="over200">Over $200</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Item Count Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Items in Order</Label>
+                  <Select
+                    value={advancedFilters.itemCount}
+                    onValueChange={(value) => setAdvancedFilters({ ...advancedFilters, itemCount: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select item count" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 item</SelectItem>
+                      <SelectItem value="2">2 items</SelectItem>
+                      <SelectItem value="3+">3+ items</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Filter Actions */}
+                <div className="flex gap-2 pt-2 border-t">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={clearFilters}
+                    disabled={activeFilterCount === 0}
+                  >
+                    Clear All
+                  </Button>
+                  <Button
+                    className="flex-1 bg-[#2D5F3F] text-white"
+                    onClick={() => {
+                      setIsFilterOpen(false);
+                      toast.success(`${activeFilterCount} filter(s) applied`);
+                    }}
+                  >
+                    Apply Filters
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -689,6 +1086,293 @@ function AnalyticsView() {
              </div>
           </CardContent>
         </Card>
+      </div>
+    </div>
+  );
+}
+
+function StoreView() {
+  const visitorData = [
+    { name: 'Mon', visits: 145 },
+    { name: 'Tue', visits: 178 },
+    { name: 'Wed', visits: 165 },
+    { name: 'Thu', visits: 198 },
+    { name: 'Fri', visits: 234 },
+    { name: 'Sat', visits: 289 },
+    { name: 'Sun', visits: 256 },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Store Header */}
+      <Card className="bg-gradient-to-r from-[#2D5F3F] to-[#3D7F5F] text-white">
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex items-center gap-6">
+              <Avatar className="w-20 h-20 border-4 border-white/30">
+                <AvatarImage src="/placeholder-avatar.jpg" />
+                <AvatarFallback className="text-2xl font-bold bg-white text-[#2D5F3F]">ME</AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-2xl font-bold">My Eco Store</h2>
+                <p className="text-white/80 mt-1">Sustainable products for a greener lifestyle</p>
+                <div className="flex items-center gap-4 mt-2">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-[#F4D35E] text-[#F4D35E]" />
+                    <span className="font-medium">4.8</span>
+                    <span className="text-white/60 text-sm">(124 reviews)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              className="bg-white text-[#2D5F3F] border-none hover:bg-white/90 gap-2"
+              onClick={() => window.location.hash = '#/home'}
+            >
+              <ExternalLink className="w-4 h-4" />
+              View as Customer
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Store Performance Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Store Views</CardTitle>
+            <Eye className="w-4 h-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#2D5F3F]">1,465</div>
+            <p className="text-xs text-green-600 mt-1">+24% from last week</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Click Rate</CardTitle>
+            <MousePointerClick className="w-4 h-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#2D5F3F]">3.2%</div>
+            <p className="text-xs text-green-600 mt-1">+0.5% this month</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Favorites</CardTitle>
+            <Heart className="w-4 h-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#2D5F3F]">89</div>
+            <p className="text-xs text-green-600 mt-1">+12 this week</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Conversion</CardTitle>
+            <ShoppingCart className="w-4 h-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#2D5F3F]">18.5%</div>
+            <p className="text-xs text-green-600 mt-1">+2.1% this month</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Visitor Analytics */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Visitor Analytics</CardTitle>
+            <CardDescription>Daily traffic to your store over the past week</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={visitorData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    cursor={{ stroke: '#2D5F3F', strokeWidth: 1, strokeDasharray: '3 3' }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="visits" 
+                    stroke="#2D5F3F" 
+                    strokeWidth={3} 
+                    dot={{ fill: '#2D5F3F', strokeWidth: 2, r: 4, stroke: '#fff' }} 
+                    activeDot={{ r: 6 }} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Store Health Score */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Store Health Score</CardTitle>
+            <CardDescription>Overall store quality rating</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center justify-center py-6">
+              <div className="relative w-32 h-32 flex items-center justify-center">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="64" cy="64" r="56" stroke="#E5E7EB" strokeWidth="12" fill="none" />
+                  <circle 
+                    cx="64" 
+                    cy="64" 
+                    r="56" 
+                    stroke="#2D5F3F" 
+                    strokeWidth="12" 
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 56}`}
+                    strokeDashoffset={`${2 * Math.PI * 56 * (1 - 0.87)}`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute flex flex-col items-center">
+                  <span className="text-3xl font-bold text-[#2D5F3F]">87</span>
+                  <span className="text-xs text-gray-500">/ 100</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 mt-4">
+                <Award className="w-5 h-5 text-[#F4D35E]" />
+                <span className="font-medium text-[#2D5F3F]">Excellent</span>
+              </div>
+            </div>
+            <div className="space-y-3 mt-6">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Product Quality</span>
+                  <span className="font-medium">95%</span>
+                </div>
+                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-[#2D5F3F] h-full" style={{width: '95%'}}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Customer Service</span>
+                  <span className="font-medium">92%</span>
+                </div>
+                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-[#2D5F3F] h-full" style={{width: '92%'}}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Shipping Speed</span>
+                  <span className="font-medium">78%</span>
+                </div>
+                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-[#F4D35E] h-full" style={{width: '78%'}}></div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Reviews & Traffic Sources */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Customer Reviews */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Customer Reviews</CardTitle>
+            <CardDescription>Latest feedback from your customers</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { name: 'Sarah M.', rating: 5, comment: 'Amazing quality products! Love the eco-friendly packaging.', time: '2 days ago' },
+                { name: 'John D.', rating: 4, comment: 'Great selection of sustainable items. Fast shipping too!', time: '5 days ago' },
+                { name: 'Emma L.', rating: 5, comment: 'Best eco store I have found. Will definitely shop again!', time: '1 week ago' },
+              ].map((review, i) => (
+                <div key={i} className="p-4 border rounded-lg bg-gray-50">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="font-medium">{review.name}</p>
+                      <div className="flex gap-0.5 mt-1">
+                        {[...Array(5)].map((_, j) => (
+                          <Star 
+                            key={j} 
+                            className={`w-3 h-3 ${j < review.rating ? 'fill-[#F4D35E] text-[#F4D35E]' : 'text-gray-300'}`} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-400">{review.time}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">{review.comment}</p>
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" className="w-full mt-4">View All Reviews</Button>
+          </CardContent>
+        </Card>
+
+        {/* Traffic Sources & Product Performance */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Traffic Sources</CardTitle>
+              <CardDescription>Where your visitors come from</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { source: 'Direct', visits: 542, percentage: 42 },
+                  { source: 'Search Engines', visits: 387, percentage: 30 },
+                  { source: 'Social Media', visits: 258, percentage: 20 },
+                  { source: 'Referrals', visits: 103, percentage: 8 },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <div className="flex justify-between text-sm mb-1.5">
+                      <span className="font-medium">{item.source}</span>
+                      <span className="text-gray-500">{item.visits} visits</span>
+                    </div>
+                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                      <div className="bg-[#2D5F3F] h-full" style={{width: `${item.percentage}%`}}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Performing Products</CardTitle>
+              <CardDescription>Most viewed this week</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {[
+                  { name: 'Organic Cotton T-Shirt', views: 234 },
+                  { name: 'Bamboo Toothbrush Set', views: 189 },
+                  { name: 'Recycled Tote Bag', views: 156 },
+                ].map((product, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span className="font-medium text-sm">{product.name}</span>
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <Eye className="w-3 h-3" />
+                      <span className="text-xs">{product.views}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
