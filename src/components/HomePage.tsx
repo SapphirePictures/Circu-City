@@ -33,6 +33,21 @@ export function HomePage() {
 
   return (
     <div className="w-full">
+      {/* Mobile Organic Product Ad - Redesigned */}
+      <div className="block md:hidden w-full px-2 pt-4 pb-2">
+        <div className="bg-[#FDE082] rounded-[28px] shadow flex flex-col items-center px-2 pt-2 pb-6" style={{border: '4px solid #FDE082'}}>
+          <div className="w-full flex items-center justify-center rounded-[18px] overflow-hidden mb-4" style={{background:'#fff', minHeight:120, minWidth:'100%'}}>
+            <img src="https://images.unsplash.com/photo-1585849835117-1446a1514ea6?w=600" alt="Organic Green Tea" className="object-contain w-full h-32" style={{maxHeight:140}} />
+          </div>
+          <div className="text-[1.5rem] font-bold text-[#21724B] text-center mb-2" style={{fontFamily:'inherit'}}>Organic Green Tea - 50 Bags</div>
+          <div className="text-[#555] text-base text-center mb-4 px-2" style={{fontFamily:'inherit'}}>Premium organic green tea leaves in compostable tea bags. Rich in antioxidants and flavor.</div>
+          <div className="flex items-end justify-center gap-2 mb-4">
+            <span className="text-3xl font-extrabold text-[#21724B]">$14.99</span>
+            <span className="text-lg text-[#C9B96B] line-through">$19.99</span>
+          </div>
+          <a href="#/product/5" className="block w-[90%] mx-auto py-4 rounded-[40px] bg-[#21724B] text-white text-xl font-medium text-center shadow-lg hover:bg-[#185c3a] transition-all" style={{fontFamily:'inherit'}}>Shop Now</a>
+        </div>
+      </div>
       {/* Hero Section */}
       <section className="relative bg-[#F5F0E6] pt-10 pb-20 px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -138,41 +153,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Sustainability Pillars */}
-      <section className="py-16 px-4 bg-[#F5F0E6]">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl text-center mb-12">Why Choose CircuCity</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-              <div className="w-16 h-16 bg-[#2D5F3F] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Leaf className="w-8 h-8 text-[#F4D35E]" />
-              </div>
-              <h3 className="text-2xl mb-3">100% Organic</h3>
-              <p className="text-gray-600">
-                All products are certified organic, free from harmful chemicals and pesticides.
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-              <div className="w-16 h-16 bg-[#2D5F3F] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Recycle className="w-8 h-8 text-[#F4D35E]" />
-              </div>
-              <h3 className="text-2xl mb-3">Recyclable</h3>
-              <p className="text-gray-600">
-                Sustainable packaging that can be recycled or composted completely.
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-              <div className="w-16 h-16 bg-[#2D5F3F] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-[#F4D35E]" />
-              </div>
-              <h3 className="text-2xl mb-3">Eco-Conscious</h3>
-              <p className="text-gray-600">
-                Every purchase helps reduce carbon footprint and supports sustainable practices.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Sustainability Pillars section removed as requested */}
 
       {/* Swap Market CTA */}
       <section className="py-16 px-4 bg-gradient-to-br from-[#2D5F3F] to-[#1a3a28] text-white overflow-hidden relative">
